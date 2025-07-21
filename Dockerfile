@@ -23,6 +23,7 @@ WORKDIR /httpbin
 # Install dependencies directly with pip3
 RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel && \
     pip3 install --no-cache-dir \
+    pycparser \
     gunicorn \
     decorator \
     brotlipy \

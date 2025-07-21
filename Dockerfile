@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM python:3.9-slim
 
 LABEL name="httpbin"
 LABEL version="0.9.2"
@@ -8,11 +8,33 @@ LABEL org.kennethreitz.vendor="Kenneth Reitz"
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
-RUN apt-get -y update && apt-get -y install libffi-dev libssl-dev && apt update -y && apt install python3-pip git -y && pip3 install --no-cache-dir pipenv
+# Install system dependencies including build tools
+RUN apt-get -y update && apt-get -y install \
+    libffi-dev \
+    libssl-dev \
+    git \
+    gcc \
+    g++ \
+    make \
+    && rm -rf /var/lib/apt/lists/*
 
-ADD Pipfile Pipfile.lock /httpbin/
 WORKDIR /httpbin
-RUN /bin/bash -c "pip3 install --no-cache-dir -r <(pipenv lock -r)"
+
+# Install dependencies directly with pip3
+RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip3 install --no-cache-dir \
+    gunicorn \
+    decorator \
+    brotlipy \
+    gevent \
+    "Flask<2.3.0" \
+    meinheld \
+    "werkzeug<2.0.0" \
+    "markupsafe<2.1.0" \
+    "jinja2<3.1.0" \
+    six \
+    flasgger \
+    pyyaml
 
 ADD . /httpbin
 RUN pip3 install --no-cache-dir /httpbin

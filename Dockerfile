@@ -20,20 +20,28 @@ RUN apt-get -y update && apt-get -y install \
 
 WORKDIR /httpbin
 
-# Install dependencies directly with pip3
-RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip3 install --no-cache-dir \
+# Install dependencies in separate steps to avoid conflicts
+RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel
+
+# Install core dependencies first
+RUN pip3 install --no-cache-dir \
     pycparser \
-    gunicorn \
-    decorator \
-    brotlipy \
-    gevent \
-    "Flask<2.3.0" \
-    meinheld \
+    cffi \
+    six
+
+# Install web framework dependencies
+RUN pip3 install --no-cache-dir \
     "werkzeug<2.0.0" \
     "markupsafe<2.1.0" \
     "jinja2<3.1.0" \
-    six \
+    "Flask<2.3.0"
+
+# Install server and other dependencies
+RUN pip3 install --no-cache-dir \
+    gunicorn \
+    decorator \
+    gevent \
+    meinheld \
     flasgger \
     pyyaml
 
